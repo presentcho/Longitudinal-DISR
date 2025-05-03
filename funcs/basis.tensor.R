@@ -1,7 +1,5 @@
-library(BPST)
-library(splines2)
-library(MGLM)
-library(Matrix)
+# basis.tensor: generates bivariate and trivariate spline basis matrix.
+
 basis.tensor <- function (ss, tt, V, Tri, d = 2, r = 1, time.knots, time.bound, 
                           rho = 3){ 
   ss <- as.matrix(ss)

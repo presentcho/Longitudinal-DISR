@@ -1,4 +1,4 @@
-# sampling.HC: identifies the index of a triangle within a triangulation using Hilbert basis filling curve.
+# sampling.HC: identifies the index of a triangle within a triangulation using Hilbert space filling-curve.
 
 sampling.HC <- function(n, V, Tr, n.layer = 2){
   points.tri <- c()

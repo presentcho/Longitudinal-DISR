@@ -49,6 +49,6 @@ Code example for the result of HD method in Table 2 in the simulation studies:: 
 
 - *local.fit.R* : fits a local estimators for each subregions.
 - *ring.dc.R*: identifies the neighborhood of a triangle within a triangulation.
-- *sampling.HC.R* : identifies the index of a triangle within a triangulation using Hilbert basis filling curve.
+- *sampling.HC.R* : identifies the index of a triangle within a triangulation using Hilbert space filling-curve.
 - *basis.tensor.local.R*: generates bivariate and trivariate spline basis matrix in each subregions.
 

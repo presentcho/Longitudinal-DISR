@@ -1,4 +1,4 @@
-#basis.tensor.local: generates bivariate and trivariate spline basis matrix in each subregions
+# basis.tensor.local: generates bivariate and trivariate spline basis matrix in each subregions
 
 basis.tensor.local <- function (ss, tt, V, Tri, d = 2, r = 1, time.knots, time.bound, 
                                 rho = 3){ 

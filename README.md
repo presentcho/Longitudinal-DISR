@@ -27,9 +27,9 @@ require(pracma)
 
 ## Code for simulation studies in the paper
 
-Code for the result of global method in Table 2 in the simulation studies: *global_simu.R*
+Code example for the result of global method in Table 2 in the simulation studies: *global_simu.R*
   
-Code for the result of HD method in Table 2 in the simulation studies:: *HD_simu.R*
+Code example for the result of HD method in Table 2 in the simulation studies:: *HD_simu.R*
   
 ## Main functions and package structure
   

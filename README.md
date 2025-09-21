@@ -27,17 +27,21 @@ require(pracma)
 
 ## Code for simulation studies in the paper
 
-Code example for the result of global method in Table 1 in the simulation studies: **
+Code example for the result of global method in Table 1 in the simulation studies: *global_simu1.R*
 
-Code example for the result of global method in Table 2 in the simulation studies: *global_simu.R*
+Code example for the result of HD method in Table 1 in the simulation studies: *HD_simu1.R*
+
+Code example for the result of global method in Table 2 in the simulation studies: *global_simu2.R*
   
-Code example for the result of HD method in Table 2 in the simulation studies:: *HD_simu.R*
+Code example for the result of HD method in Table 2 in the simulation studies:: *HD_simu2.R*
   
 ## Main functions and package structure
   
 ### Major functions
   
-- *simul.data.gen.R*: generates random datasets for model fitting.
+- *simul1.data.gen.R*: generates random datasets for simulation study I scenario.
+- *simul2.data.gen.R*: generates random datasets for simulation study II scenario.
+- *bivar.gc.fit.R*: fits only bivariate estimators (without reference-level trajectories term).
 - *gc.fit.R*: fits estimators through global methods.
 - *gc.fit.dc.R*: fits estimators through a parallel algorithm based on domain decomposition.
 
@@ -50,6 +54,7 @@ Code example for the result of HD method in Table 2 in the simulation studies:: 
 ### Functions for domain decomposition
 
 - *local.fit.R* : fits a local estimators for each subregions.
+- *local.fit.bivar.R* : fits a local bivariate estimators for each subregions.
 - *ring.dc.R*: identifies the neighborhood of a triangle within a triangulation.
 - *sampling.HC.R* : identifies the index of a triangle within a triangulation using Hilbert space filling-curve.
 - *basis.tensor.local.R*: generates bivariate and trivariate spline basis matrix in each subregions.

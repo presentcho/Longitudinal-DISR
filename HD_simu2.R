@@ -14,7 +14,7 @@ library(gghilbertstrings)
 library(parallel)
 library(prodlim)
 
-source('funcs/simul.data.gen.R')
+source('funcs/simul2.data.gen.R')
 source('funcs/basis.tensor.R')
 source('funcs/energy.tensor.R')
 source('funcs/gc.fit.R')

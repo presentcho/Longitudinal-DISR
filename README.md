@@ -5,7 +5,7 @@ Hyunjae Cho, Yaotian Wang, and Shan Yu
 
 2025-05-03
 
-The codes are to implement simulation study II. The algorithm fits global and HD methods through a parallel algorithm based on domain decomposition.
+The codes are to implement simulation study I & II. The algorithm fits global and HD methods through a parallel algorithm based on domain decomposition.
 
 ## Required packages
 
@@ -26,6 +26,8 @@ require(pracma)
 ```
 
 ## Code for simulation studies in the paper
+
+Code example for the result of global method in Table 1 in the simulation studies: **
 
 Code example for the result of global method in Table 2 in the simulation studies: *global_simu.R*
   

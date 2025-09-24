@@ -10,7 +10,7 @@ library(colorRamps)
 
 library(splines2)
 require(MGLM)
-source('funcs/simul1_data_gen.R')
+source('funcs/simul1.data.gen.R')
 source('funcs/bivar.gc.fit.R')
 
 ################################################################################

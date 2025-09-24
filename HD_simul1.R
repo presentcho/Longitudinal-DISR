@@ -11,7 +11,7 @@ library(gghilbertstrings)
 library(parallel)
 library(splines2)
 require(MGLM)
-source('funcs/simul1_data_gen.R')
+source('funcs/simul1.data.gen.R')
 source('funcs/bivar.gc.fit.R')
 source('funcs/ring.dc.R')
 source('funcs/sampling.HC.R')
@@ -74,7 +74,8 @@ simulation <- function(n.sim){
     fit.all <- mclapply(idx.sample.tri, FUN = local.fit.bivar, mc.cores = core,
                         V0 = Ver, Tr0 = Tr, TV0 = TV, n.layer = n.layer, 
                         Y.all = Y_tilde, X.all = X_tilde,
-                        Z.all = V, d = 5, r = 1, lambda = 10^(seq(-6, 0, by = 1)))
+                        Z.all = V, d = d, r = r, lambda = 10^(seq(-6, 0, by = 1)))
+    
     gamma.all <- matrix(0, ncol = ncol(X_tilde), nrow = nrow(Tr) * (d+1) * (d+2)/2)
     count.tri <- rep(0, nrow(Tr))
     
@@ -105,7 +106,7 @@ simulation <- function(n.sim){
 nT <- 6
 n.samp <- 20
 n.layer <- 2
-core <- 1
+core <- 2
 n <- 100; d <- 5; r <- 1
 simulation(100)
 

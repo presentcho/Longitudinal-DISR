@@ -25,92 +25,140 @@ source('funcs/ring.dc.R')
 source('funcs/basis.tensor.local.R')
 source('funcs/local.fit.R')
 
-ddc.fit.simul <- function(iter){
+simulation <- function(iter){
   set.seed(iter)
-  bb <- Triangulation::hs
-  VT <- TriMesh(bb, n = nT)
-  Tr <- as.matrix(VT$Tr) 
-  Ver <- as.matrix(VT$V) 
+  # Generate simulation data
+  dat <- simul.data.gen(n, Tr, Ver, V.all)
+  X <- dat$X
+  Y <- dat$Y
+  V <- dat$V
+  M <- dat$M.vec
+  tij <- dat$tij
+  bivar.true <- cbind(dat$bivar.alpha, dat$bivar.beta)
+  trivar.true <- dat$tri.alpha
+
+  cv.fit <- gc.fit.cv.k(nfold=5,X=X, Y=Y, V=V, M=M, tij=tij)
   
-  # Set boundary 
-  xm <- seq(-1, 3.5, length = 200)
-  yn <- seq(-1, 1, length = 200)
-  xy_grid <- pracma::meshgrid(xm, yn)
-  uu <- c(xy_grid$X)
-  vv <- c(xy_grid$Y)
-  V <- as.matrix(cbind(uu,vv))
-  
-  # Generate dataset
-  t0 <- proc.time()
-  dat <- simul.data.gen(n, Tr, Ver, V)
-  L <- 3
-  rho <- 3
-  time.bound<- c(min(dat$tij), max(dat$tij))
-  probs <- seq(0, 1, length.out = L + 2)
-  time.knots <- quantile(dat$tij, probs = probs)[-c(1, L + 2)]
+  lambda11.optimal <- cv.fit$lambda11
+  lambda12.optimal <- cv.fit$lambda12
+  lambda2.optimal <- cv.fit$lambda2
   
   sampling.res <- sampling.HC(n.samp, Ver, Tr, n.layer)
   count.tri <- rep(0, nrow(Tr))
   TV <- tdata(Ver, Tr)$TV
   idx.sample.tri <- sampling.res$sample.tri
   
-  # fits estimators using HD method
-  lambda11.r = exp(seq(log(0.001), log(1000), length.out = 5))
-  lambda12.r = exp(seq(log(0.001), log(1000), length.out = 5))
-  lambda2.r = exp(seq(log(0.001), log(1000), length.out = 5))
-  fit.all <- mclapply(idx.sample.tri, function(iter) {
-    local.fit(iter, Ver0 = Ver, Tr0 = Tr, TV0 = TV, n.layer = n.layer, 
-              X = dat$X, Y = dat$Y, V = dat$V, M = dat$M.vec, tij = dat$tij,
-              d = d, r = r, L = L, rho = rho, 
-              time.knots = time.knots, time.bound = time.bound,
-              lambda11 = exp(seq(log(0.001), log(1000), length.out = 5)), 
-              lambda12 = exp(seq(log(0.001), log(1000), length.out = 5)), 
-              lambda2 = exp(seq(log(0.001), log(1000), length.out = 5)))
-  }, mc.cores = n.core, mc.preschedule = TRUE)
+  fit.dc <- gc.fit.dc.k(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
+                                  n.layer = n.layer, X = X, Y = Y, V = V, M= M, tij = tij,
+                                  d=d, r=r, L=L, rho=rho, 
+                      lambda11=lambda11.optimal, lambda12 = lambda12.optimal, lambda2= lambda2.optimal)
+  bivar.est <- as.matrix(fit.dc$bivar.est)
+  trivar.est <- as.matrix(fit.dc$trivar.est)
   
-  gamma.all <- matrix(0, ncol = L+rho, nrow = nrow(Tr)*(d+1)*(d+2)/2)
-  theta.all <- matrix(0, ncol = ncol(dat$X), nrow = nrow(Tr)*(d+1)*(d+2)/2)
-  
-  for(iter in 1:length(fit.all)) {
-    idx.tr <- fit.all[[iter]]$idx.tr
-    count.tri[idx.tr] <- count.tri[idx.tr] + 1
-    gamma.all[fit.all[[iter]]$idx.psi,] = gamma.all[fit.all[[iter]]$idx.psi,] + fit.all[[iter]]$gamma.hat
-    theta.all[fit.all[[iter]]$idx.psi,] = theta.all[fit.all[[iter]]$idx.psi,] + fit.all[[iter]]$theta.hat
+  boot_trivar <- list()
+  boot_beta <- array(NA_real_, dim = c(nrow(bivar.est), ncol(bivar.est), nboot))
+  for(b in 1:nboot){
+    sampling <- sample(nrow(X), replace = TRUE)
+    X.s <- X[sampling,]
+    Y.s <- Y[sampling,]
+    M.s <- M[sampling]
+    t.s <- tij[sampling]
+    
+    fit.b <- gc.fit.dc.k(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
+                          n.layer = n.layer, X = X.s, Y = Y.s, V = V, M= M.s, tij = t.s,
+                          d=d, r=r, L=L, rho=rho,
+                          lambda11=lambda11.optimal, lambda12 = lambda12.optimal, lambda2= lambda2.optimal)
+    boot_beta[,,b] <- as.matrix(fit.b$bivar.est)
+    boot_trivar[[b]] <- as.matrix(fit.b$trivar.est)
   }
+  # obtain bootstrap variance matrix
+  bivar.se.mat <- apply(boot_beta, c(1,2), sd, na.rm = TRUE)
+  trivar.se.mat <- apply(simplify2array(boot_trivar), c(1,2), sd)
+  bivar.var.mat <- apply(boot_beta, c(1,2), var, na.rm = TRUE)
+  trivar.var.mat <- apply(simplify2array(boot_trivar), c(1,2), var)
+  var.res <- round(c(mean(trivar.var.mat), colMeans(bivar.var.mat)), 4)
   
-  nbasis.tri <- (d+1)*(d+2)/2
-  count.psi <- rep(count.tri, each = nbasis.tri)
-  mean.gamma <- 1/count.psi * gamma.all
-  mean.theta <- 1/count.psi * theta.all
+  # obtain coverage probability
+  # 95% coverage rate
+  trivar.coverage.lower.95 <- trivar.est + qnorm(0.05/2)*trivar.se.mat
+  trivar.coverage.upper.95 <- trivar.est + qnorm(1-0.05/2)*trivar.se.mat
+  bivar.coverage.lower.95 <- bivar.est + qnorm(0.05/2)*bivar.se.mat
+  bivar.coverage.upper.95 <- bivar.est + qnorm(1-0.05/2)*bivar.se.mat
+  trivar.covered.95 <- (trivar.true >= trivar.coverage.lower.95) & (trivar.true <= trivar.coverage.upper.95)
+  bivar.covered.95 <- (bivar.true >= bivar.coverage.lower.95) & (bivar.true <= bivar.coverage.upper.95)
+  covered.bivar.95 <- colMeans(bivar.covered.95)
+  covered.trivar.95 <- mean(rowMeans(trivar.covered.95))
+  covered.95 <- c(covered.trivar.95, covered.bivar.95)
   
-  p = dim(dat$X)[2]
-  Basis <- basis.tensor(ss = dat$V, tt = dat$tij, V = Ver, Tri = Tr,
-                        d = d, r = r, time.knots = time.knots, time.bound = time.bound, rho = rho)
+  # 90% coverage rate
+  trivar.coverage.lower.90 <- trivar.est + qnorm(0.1/2)*trivar.se.mat
+  trivar.coverage.upper.90 <- trivar.est + qnorm(1-0.1/2)*trivar.se.mat
+  bivar.coverage.lower.90 <- bivar.est + qnorm(0.1/2)*bivar.se.mat
+  bivar.coverage.upper.90 <- bivar.est + qnorm(1-0.1/2)*bivar.se.mat
+  trivar.covered.90 <- (trivar.true >= trivar.coverage.lower.90) & (trivar.true <= trivar.coverage.upper.90)
+  bivar.covered.90 <- (bivar.true >= bivar.coverage.lower.90) & (bivar.true <= bivar.coverage.upper.90)
+  covered.bivar.90 <- colMeans(bivar.covered.90)
+  covered.trivar.90 <- mean(rowMeans(trivar.covered.90))
+  covered.90 <- c(covered.trivar.90, covered.bivar.90)
   
-  est.gamma = solve(crossprod(Basis$Q2), crossprod(Basis$Q2, mean.gamma))
-  est.theta = solve(crossprod(Basis$Q2), crossprod(Basis$Q2, mean.theta))
+  # 99% coverage rate
+  trivar.coverage.lower.99 <- trivar.est + qnorm(0.01/2)*trivar.se.mat
+  trivar.coverage.upper.99 <- trivar.est + qnorm(1-0.01/2)*trivar.se.mat
+  bivar.coverage.lower.99 <- bivar.est + qnorm(0.01/2)*bivar.se.mat
+  bivar.coverage.upper.99 <- bivar.est + qnorm(1-0.01/2)*bivar.se.mat
+  trivar.covered.99 <- (trivar.true >= trivar.coverage.lower.99) & (trivar.true <= trivar.coverage.upper.99)
+  bivar.covered.99 <- (bivar.true >= bivar.coverage.lower.99) & (bivar.true <= bivar.coverage.upper.99)
+  covered.bivar.99 <- colMeans(bivar.covered.99)
+  covered.trivar.99 <- mean(rowMeans(trivar.covered.99))
+  covered.99 <- c(covered.trivar.99, covered.bivar.99)
   
-  alpha0.hat <- tcrossprod(Basis$U0, (Basis$B0 %*% Basis$Q2 %*% est.gamma)) 
-  bivar.est <- Basis$B0 %*% Basis$Q2 %*% est.theta 
-  
-  t1 <- proc.time() - t0
-  bivariate.true <- cbind(dat$bivar.alpha, dat$bivar.beta)
-  trivariate.true <- dat$tri.alpha
-  trivariate.est <- alpha0.hat
+  # bias and MISE
   trivar.all <- c()
-  for(i in 1:nrow(trivariate.est)){
-    trivar.all[i] <- mean((trivariate.est[i, ] - trivariate.true[i, ])^2, na.rm = TRUE)
+  trivar.bias <- c()
+  for(i in 1:nrow(trivar.est)){
+    trivar.all[i] <- mean((trivar.est[i, ] - trivar.true[i, ])^2, na.rm = TRUE)
+    trivar.bias[i] <- mean((trivar.est[i, ] - trivar.true[i, ]), na.rm = TRUE)
   }
   
-  final.res <- c(round(c(mean(trivar.all), apply((bivariate.true - bivar.est)^2, 2, mean, na.rm = TRUE)), 4), round(t1['elapsed']))
-  names(final.res)[1] <- 'alpha0'
-  return(final.res)
+  MISE.res <- c(round(c(mean(trivar.all), apply((bivar.true - bivar.est)^2, 2, mean, na.rm = TRUE)), 4))
+  names(MISE.res)[1] <- 'alpha0'
+  bias.res <- c(round(c(mean(trivar.bias), apply((bivar.true - bivar.est), 2, mean, na.rm = TRUE)), 4))
+  
+  
+  return(list(bias = bias.res, MISE = MISE.res,
+              bivar.covered.90=bivar.covered.90,
+              trivar.covered.90=trivar.covered.90,
+              bivar.covered.95=bivar.covered.95,
+              trivar.covered.95=trivar.covered.95,
+              bivar.covered.99=bivar.covered.99,
+              trivar.covered.99=trivar.covered.99,
+              variance=var.res ))
 }
 
-# Set parameters
-n <- 100
-d <- 2; r <- 1
+L <- 3
+rho <- 3
 nT <- 6
-n.samp <- 20; n.layer <- 3; n.core <- 8                  
-res <- lapply(c(1:100), ddc.fit.simul)
-round(colMeans(do.call(rbind, res)), 4)
+n.samp <- 20; n.layer <- 2; n.core <- 2
+n <- 100; d <- 2; r <- 1
+nboot<- 100
+
+# Set boundary 
+xm <- seq(-1, 3.5, length = 101)
+yn <- seq(-1, 1, length = 101)
+xy_grid <- pracma::meshgrid(xm, yn)
+uu <- c(xy_grid$X)
+vv <- c(xy_grid$Y)
+V.all <- as.matrix(cbind(uu,vv))
+
+# Load horseshoe and find triangulation 
+bb <- Triangulation::hs
+VT <- TriMesh(bb, n = nT)
+Tr <- as.matrix(VT$Tr) 
+Ver <- as.matrix(VT$V) 
+
+t0 <- proc.time()
+res <- lapply(1:100, function(iter) simulation(iter))
+proc.time() - t0
+bias_mat <- do.call(rbind, lapply(res, `[[`, "bias"))
+MISE_mat <- do.call(rbind, lapply(res, `[[`, "MISE"))
+var_mat  <- do.call(rbind, lapply(res, `[[`, "variance"))

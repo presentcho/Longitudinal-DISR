@@ -1,6 +1,6 @@
-# gc.fit.dc.k: fits estimators through a parallel algorithm based on domain decomposition
+# gc.fit.dc: fits estimators through a parallel algorithm based on domain decomposition
 
-gc.fit.dc.k <- function(idx.sample.tri, Tr, Ver, TV, n.layer, 
+gc.fit.dc <- function(idx.sample.tri, Tr, Ver, TV, n.layer, 
                         X, Y, V, M, tij, d, r, L, rho, 
                         lambda11, lambda12, lambda2, Basis){
   time.bound<- c(min(tij), max(tij))
@@ -17,7 +17,7 @@ gc.fit.dc.k <- function(idx.sample.tri, Tr, Ver, TV, n.layer,
   P2 <- kronecker(diag(ncol(X)), as.matrix(crossprod(Q2, K) %*% Q2))
   
   fit.all <- mclapply(idx.sample.tri, function(iter) {
-    local.fit.k(iter, Ver0 = Ver, Tr0 = Tr, TV0 = TV, n.layer = n.layer, 
+    local.fit(iter, Ver0 = Ver, Tr0 = Tr, TV0 = TV, n.layer = n.layer, 
                 X = X, Y = Y, V = V, M = M, tij = tij,
                 d = d, r = r, L = L, rho = rho, 
                 time.knots = time.knots, time.bound = time.bound, 

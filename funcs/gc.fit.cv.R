@@ -1,4 +1,6 @@
-gc.fit.cv.k <- function(nfold, X, Y, V, M, tij, lambda11 = exp(seq(log(0.001), log(1000), length.out = 5)),
+# gc.fit.cv: select tuning parameters using cross-validation 
+
+gc.fit.cv <- function(nfold, X, Y, V, M, tij, lambda11 = exp(seq(log(0.001), log(1000), length.out = 5)),
                         lambda12 = exp(seq(log(0.001), log(1000), length.out = 5)),
                         lambda2 = 10^seq(-3,3,by=0.5), iter = 2024){
   time.bound<- c(min(tij), max(tij))

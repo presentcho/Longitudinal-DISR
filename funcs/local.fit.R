@@ -1,4 +1,6 @@
-local.fit.k <- function(iter, Ver0, Tr0, TV0, n.layer, X, Y, V, M, tij, 
+# local.fit: fits local estimators 
+
+local.fit <- function(iter, Ver0, Tr0, TV0, n.layer, X, Y, V, M, tij, 
                         d, r, L, rho, time.knots, time.bound, lambda11, lambda12, lambda2
 ) {
   # generate basis function

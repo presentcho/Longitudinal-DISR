@@ -19,12 +19,12 @@ source('funcs/basis.tensor.R')
 source('funcs/energy.tensor.R')
 source('funcs/gc.fit.R')
 source('funcs/gc.fit.ho.R')
-source('funcs/gc.fit.dc.k.R')
+source('funcs/gc.fit.dc.R')
 source('funcs/sampling.HC.R')
 source('funcs/ring.dc.R')
 source('funcs/basis.tensor.local.R')
-source('funcs/local.fit.k.R')
-source('funcs/gc.fit.cv.k.R')
+source('funcs/local.fit.R')
+source('funcs/gc.fit.cv.R')
 
 
 simulation <- function(iter){
@@ -39,7 +39,7 @@ simulation <- function(iter){
   bivar.true <- cbind(dat$bivar.alpha, dat$bivar.beta)
   trivar.true <- dat$tri.alpha
 
-  cv.fit <- gc.fit.cv.k(nfold=5,X=X, Y=Y, V=V, M=M, tij=tij)
+  cv.fit <- gc.fit.cv(nfold=5,X=X, Y=Y, V=V, M=M, tij=tij)
   
   lambda11.optimal <- cv.fit$lambda11
   lambda12.optimal <- cv.fit$lambda12
@@ -50,7 +50,7 @@ simulation <- function(iter){
   TV <- tdata(Ver, Tr)$TV
   idx.sample.tri <- sampling.res$sample.tri
   
-  fit.dc <- gc.fit.dc.k(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
+  fit.dc <- gc.fit.dc(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
                                   n.layer = n.layer, X = X, Y = Y, V = V, M= M, tij = tij,
                                   d=d, r=r, L=L, rho=rho, 
                       lambda11=lambda11.optimal, lambda12 = lambda12.optimal, lambda2= lambda2.optimal)
@@ -66,7 +66,7 @@ simulation <- function(iter){
     M.s <- M[sampling]
     t.s <- tij[sampling]
     
-    fit.b <- gc.fit.dc.k(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
+    fit.b <- gc.fit.dc(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
                           n.layer = n.layer, X = X.s, Y = Y.s, V = V, M= M.s, tij = t.s,
                           d=d, r=r, L=L, rho=rho,
                           lambda11=lambda11.optimal, lambda12 = lambda12.optimal, lambda2= lambda2.optimal)

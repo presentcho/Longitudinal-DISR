@@ -1,3 +1,5 @@
+# gc.fit.ho: obtain sse/mse using train and test dataset
+
 gc.fit.ho <- function(X.train, Y.train, M.train, U0.train,
                       X.test, Y.test, M.test, U0.test, 
                       V, B0, Q2, K, P11, P12, P2, lambda11, lambda12, lambda2){

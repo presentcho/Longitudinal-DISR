@@ -39,7 +39,7 @@ simulation <- function(iter){
   P2 <- kronecker(diag(ncol(X)), as.matrix(crossprod(Q2, K) %*% Q2))
   
   # find optimal tuning parameters 
-  cv.fit <- gc.fit.cv(nfold = 5, X, Y, V, M, tij, Basis)
+  cv.fit <- gc.fit.cv(nfold=5,X=X, Y=Y, V=V, M=M, tij=tij)
   lambda11.optimal <- cv.fit$lambda11
   lambda12.optimal <- cv.fit$lambda12
   lambda2.optimal <- cv.fit$lambda2

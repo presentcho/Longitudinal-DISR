@@ -1,3 +1,5 @@
+# local.fit.bivar: fits local estimators for simulation study I HD method (exclude tensor-product component)
+
 local.fit.bivar <- function(iter, V0, Tr0, TV0, n.layer = 2, Y.all, X.all, Z.all, 
                       d = 5, r = 1, lambda = lambda) {
   nbasis.tri <- (d + 1) * (d + 2) / 2

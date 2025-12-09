@@ -1,3 +1,5 @@
+# bivar.gc.fit: fits estimators for simulation study I global method
+
 bivar.gc.fit =function(B,Q2,K,lambda,X,Y){
   
   n=nrow(Y)

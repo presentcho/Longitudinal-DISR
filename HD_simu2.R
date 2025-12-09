@@ -18,12 +18,14 @@ source('funcs/simul2.data.gen.R')
 source('funcs/basis.tensor.R')
 source('funcs/energy.tensor.R')
 source('funcs/gc.fit.R')
-source('funcs/gc.fit.gcv.R')
-source('funcs/gc.fit.dc.R')
+source('funcs/gc.fit.ho.R')
+source('funcs/gc.fit.dc.k.R')
 source('funcs/sampling.HC.R')
 source('funcs/ring.dc.R')
 source('funcs/basis.tensor.local.R')
-source('funcs/local.fit.R')
+source('funcs/local.fit.k.R')
+source('funcs/gc.fit.cv.k.R')
+
 
 simulation <- function(iter){
   set.seed(iter)
@@ -80,38 +82,11 @@ simulation <- function(iter){
   
   # obtain coverage probability
   # 95% coverage rate
-  trivar.coverage.lower.95 <- trivar.est + qnorm(0.05/2)*trivar.se.mat
-  trivar.coverage.upper.95 <- trivar.est + qnorm(1-0.05/2)*trivar.se.mat
   bivar.coverage.lower.95 <- bivar.est + qnorm(0.05/2)*bivar.se.mat
   bivar.coverage.upper.95 <- bivar.est + qnorm(1-0.05/2)*bivar.se.mat
-  trivar.covered.95 <- (trivar.true >= trivar.coverage.lower.95) & (trivar.true <= trivar.coverage.upper.95)
   bivar.covered.95 <- (bivar.true >= bivar.coverage.lower.95) & (bivar.true <= bivar.coverage.upper.95)
   covered.bivar.95 <- colMeans(bivar.covered.95)
-  covered.trivar.95 <- mean(rowMeans(trivar.covered.95))
-  covered.95 <- c(covered.trivar.95, covered.bivar.95)
-  
-  # 90% coverage rate
-  trivar.coverage.lower.90 <- trivar.est + qnorm(0.1/2)*trivar.se.mat
-  trivar.coverage.upper.90 <- trivar.est + qnorm(1-0.1/2)*trivar.se.mat
-  bivar.coverage.lower.90 <- bivar.est + qnorm(0.1/2)*bivar.se.mat
-  bivar.coverage.upper.90 <- bivar.est + qnorm(1-0.1/2)*bivar.se.mat
-  trivar.covered.90 <- (trivar.true >= trivar.coverage.lower.90) & (trivar.true <= trivar.coverage.upper.90)
-  bivar.covered.90 <- (bivar.true >= bivar.coverage.lower.90) & (bivar.true <= bivar.coverage.upper.90)
-  covered.bivar.90 <- colMeans(bivar.covered.90)
-  covered.trivar.90 <- mean(rowMeans(trivar.covered.90))
-  covered.90 <- c(covered.trivar.90, covered.bivar.90)
-  
-  # 99% coverage rate
-  trivar.coverage.lower.99 <- trivar.est + qnorm(0.01/2)*trivar.se.mat
-  trivar.coverage.upper.99 <- trivar.est + qnorm(1-0.01/2)*trivar.se.mat
-  bivar.coverage.lower.99 <- bivar.est + qnorm(0.01/2)*bivar.se.mat
-  bivar.coverage.upper.99 <- bivar.est + qnorm(1-0.01/2)*bivar.se.mat
-  trivar.covered.99 <- (trivar.true >= trivar.coverage.lower.99) & (trivar.true <= trivar.coverage.upper.99)
-  bivar.covered.99 <- (bivar.true >= bivar.coverage.lower.99) & (bivar.true <= bivar.coverage.upper.99)
-  covered.bivar.99 <- colMeans(bivar.covered.99)
-  covered.trivar.99 <- mean(rowMeans(trivar.covered.99))
-  covered.99 <- c(covered.trivar.99, covered.bivar.99)
-  
+ 
   # bias and MISE
   trivar.all <- c()
   trivar.bias <- c()
@@ -126,12 +101,7 @@ simulation <- function(iter){
   
   
   return(list(bias = bias.res, MISE = MISE.res,
-              bivar.covered.90=bivar.covered.90,
-              trivar.covered.90=trivar.covered.90,
               bivar.covered.95=bivar.covered.95,
-              trivar.covered.95=trivar.covered.95,
-              bivar.covered.99=bivar.covered.99,
-              trivar.covered.99=trivar.covered.99,
               variance=var.res ))
 }
 
@@ -156,9 +126,12 @@ VT <- TriMesh(bb, n = nT)
 Tr <- as.matrix(VT$Tr) 
 Ver <- as.matrix(VT$V) 
 
-t0 <- proc.time()
 res <- lapply(1:100, function(iter) simulation(iter))
-proc.time() - t0
 bias_mat <- do.call(rbind, lapply(res, `[[`, "bias"))
 MISE_mat <- do.call(rbind, lapply(res, `[[`, "MISE"))
 var_mat  <- do.call(rbind, lapply(res, `[[`, "variance"))
+CP_mat  <- do.call(rbind, lapply(res, `[[`, "bivar.covered.95"))
+round(colMeans(bias_mat), 4)
+round(colMeans(MISE_mat), 4)
+round(colMeans(var_mat), 4)
+round(colMeans(CP_mat), 4)

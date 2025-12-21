@@ -2,7 +2,7 @@
 
 gc.fit.dc <- function(idx.sample.tri, Tr, Ver, TV, n.layer, 
                         X, Y, V, M, tij, d, r, L, rho, 
-                        lambda11, lambda12, lambda2, Basis){
+                        lambda11, lambda12, lambda2){
   time.bound<- c(min(tij), max(tij))
   probs <- seq(0, 1, length.out = L + 2)
   time.knots <- quantile(tij, probs = probs)[-c(1, L + 2)]

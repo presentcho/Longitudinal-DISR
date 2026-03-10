@@ -20,7 +20,7 @@ source('funcs/local.fit.bivar.R')
 ################################################################################
 simulation <- function(iter){
   set.seed(iter)
-  # Generate simulation data
+  # Generate datasets and true coefficient parameters
   dat <- simul.data.gen(n, Tr, Ver, V.all)
   Y <- dat$Y 
   X <- dat$X 
@@ -31,12 +31,11 @@ simulation <- function(iter){
   beta.true <- dat$bivar.beta
   bivar.true <- cbind(alpha.true, beta.true)
   
-  # bootstrap sampling
   lambda <- 10^(seq(-6, 0, by = 1))
   Y.est <- Y[,ind.inside]
   V <- V.all[ind.inside, ]
   
-  # get basis
+  # Construct bivariate spline basis functions over the triangulation
   if(d > 1){
     Ball <- basis(Ver, Tr, d, r, V)
     K <- Ball$K
@@ -53,7 +52,7 @@ simulation <- function(iter){
   TV <- tdata(Ver, Tr)$TV
   idx.sample.tri <- result$sample.tri
   
-  # distributed learning
+  # Execute HD method- local fitting across subregions and aggregate
   fit.all <- mclapply(idx.sample.tri, FUN = local.fit.bivar, mc.cores = core,
                       V0 = Ver, Tr0 = Tr, TV0 = TV, n.layer = n.layer, 
                       Y.all = Y_tilde, X.all = X_tilde,
@@ -86,7 +85,7 @@ simulation <- function(iter){
     X_tilde.s <- M.s * X.s
     Y_tilde.s <- M.s * Y.est.s
     
-    # distributed learning
+    # Distributed learning
     fit.boot <- mclapply(idx.sample.tri, FUN = local.fit.bivar, mc.cores = core,
                          V0 = Ver, Tr0 = Tr, TV0 = TV, n.layer = n.layer, 
                          Y.all = Y_tilde.s, X.all = X_tilde.s,
@@ -109,19 +108,18 @@ simulation <- function(iter){
     bivar.hat.b <- Ball$B %*% Ball$Q2 %*% theta.hat.b
     boot_beta[,,b] <- as.matrix(bivar.hat.b)
   }
-  # obtain bootstrap variance matrix
+  # Obtain bootstrap variance matrix
   variance.mat <- apply(boot_beta, c(1,2), var, na.rm = TRUE)
   se.mat <- apply(boot_beta, c(1,2), sd, na.rm = TRUE)
-  # obtain coverage probability
-  # 95% coverage rate
+  # Obtain coverage probability (95%)
   coverage.prob.lower_95 <- bivar.est + qnorm(0.05/2)*se.mat
   coverage.prob.upper_95 <- bivar.est + qnorm(1-0.05/2)*se.mat
   covered_95 <- (bivar.true[ind.inside,] >= coverage.prob.lower_95) & (bivar.true[ind.inside,] <= coverage.prob.upper_95)
   covered.mean_95 <- colMeans(covered_95)
   
-  # obtain bias
+  # Calculate Bias
   bias.res <- apply((bivar.est - bivar.true[ind.inside,]), 2, mean, na.rm = TRUE)
-  # obtain mise
+  # Calculate MISE
   mse.res <- apply((bivar.est - bivar.true[ind.inside,])^2, 2, mean, na.rm = TRUE)
   return(list(bias = bias.res, MISE = mse.res,
               coverage.rate.95=covered.mean_95, 
@@ -136,7 +134,7 @@ core <- 2
 n <- 100; d <- 2; r <- 1
 nboot<- 100
 
-# Set boundary 
+# Define 2D spatial grid and extract coordinate vectors
 xm <- seq(-1, 3.5, length = 101)
 yn <- seq(-1, 1, length = 101)
 xy_grid <- pracma::meshgrid(xm, yn)
@@ -144,7 +142,7 @@ uu <- c(xy_grid$X)
 vv <- c(xy_grid$Y)
 V.all <- as.matrix(cbind(uu,vv))
 
-# Load horseshoe and find triangulation 
+# Load horseshoe domain and construct triangulation mesh
 bb <- Triangulation::hs
 VT <- TriMesh(bb, n = nT)
 Tr <- as.matrix(VT$Tr) 

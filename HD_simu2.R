@@ -87,7 +87,7 @@ simulation <- function(iter){
   bivar.covered.95 <- (bivar.true >= bivar.coverage.lower.95) & (bivar.true <= bivar.coverage.upper.95)
   covered.bivar.95 <- colMeans(bivar.covered.95)
  
-  # bias and MISE
+  # Bias and MISE
   trivar.all <- c()
   trivar.bias <- c()
   for(i in 1:nrow(trivar.est)){

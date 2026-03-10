@@ -127,6 +127,7 @@ simulation <- function(iter){
               variance = colMeans(variance.mat)))
 }
 
+# Initialize model parameters (Sample size, degree, and smoothness)
 nT <- 6
 n.samp <- 20
 n.layer <- 3

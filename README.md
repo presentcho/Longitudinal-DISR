@@ -1,7 +1,6 @@
 # Distributed Multivariate Spline Estimation for Longitudinal Image-on-Scalar Regression
 
 **Authors:** Hyunjae Cho, Yaotian Wang, and Shan Yu
-**Date:** 2025-05-03
 
 This repository contains the code and supplementary data to implement Simulation Study I & II as described in the paper. The algorithm fits global and High-Dimensional (HD) methods using a parallel computing approach based on domain decomposition.
 

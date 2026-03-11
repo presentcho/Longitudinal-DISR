@@ -38,7 +38,7 @@ simulation <- function(iter){
   tij <- dat$tij
   bivar.true <- cbind(dat$bivar.alpha, dat$bivar.beta)
   trivar.true <- dat$tri.alpha
-
+  # Find optimal turning paramters
   cv.fit <- gc.fit.cv(nfold=5,X=X, Y=Y, V=V, M=M, tij=tij)
   
   lambda11.optimal <- cv.fit$lambda11

@@ -92,7 +92,8 @@ simulation <- function(iter){
                          Z.all = V, d = d, r = r, lambda = 10^(seq(-6, 0, by = 1)))
     gamma.all.b <- matrix(0, ncol = ncol(X_tilde.s), nrow = nrow(Tr) * (d+1) * (d+2)/2)
     count.tri.b <- rep(0, nrow(Tr))
-    
+
+    # Bootstrap
     for(iter in 1:length(fit.boot)) {
       idx.tr.b <- fit.boot[[iter]]$idx.tr
       count.tri.b[idx.tr.b] <- count.tri.b[idx.tr.b] + 1

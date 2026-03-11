@@ -29,7 +29,7 @@ source('funcs/gc.fit.cv.R')
 
 simulation <- function(iter){
   set.seed(iter)
-  # Generate simulation data
+  # Generate datasets and true coefficient parameters
   dat <- simul.data.gen(n, Tr, Ver, V.all)
   X <- dat$X
   Y <- dat$Y
@@ -50,6 +50,7 @@ simulation <- function(iter){
   TV <- tdata(Ver, Tr)$TV
   idx.sample.tri <- sampling.res$sample.tri
   
+  # Fit the HD model to estimate proposed coefficient functions
   fit.dc <- gc.fit.dc(idx.sample.tri = idx.sample.tri, Tr = Tr, Ver = Ver, TV = TV, 
                                   n.layer = n.layer, X = X, Y = Y, V = V, M= M, tij = tij,
                                   d=d, r=r, L=L, rho=rho, 
@@ -57,6 +58,7 @@ simulation <- function(iter){
   bivar.est <- as.matrix(fit.dc$bivar.est)
   trivar.est <- as.matrix(fit.dc$trivar.est)
   
+  # Bootstrap 
   boot_trivar <- list()
   boot_beta <- array(NA_real_, dim = c(nrow(bivar.est), ncol(bivar.est), nboot))
   for(b in 1:nboot){
@@ -73,15 +75,14 @@ simulation <- function(iter){
     boot_beta[,,b] <- as.matrix(fit.b$bivar.est)
     boot_trivar[[b]] <- as.matrix(fit.b$trivar.est)
   }
-  # obtain bootstrap variance matrix
+  # Obtain bootstrap variance matrix
   bivar.se.mat <- apply(boot_beta, c(1,2), sd, na.rm = TRUE)
   trivar.se.mat <- apply(simplify2array(boot_trivar), c(1,2), sd)
   bivar.var.mat <- apply(boot_beta, c(1,2), var, na.rm = TRUE)
   trivar.var.mat <- apply(simplify2array(boot_trivar), c(1,2), var)
   var.res <- round(c(mean(trivar.var.mat), colMeans(bivar.var.mat)), 4)
   
-  # obtain coverage probability
-  # 95% coverage rate
+  # Obtain coverage probability (95%)
   bivar.coverage.lower.95 <- bivar.est + qnorm(0.05/2)*bivar.se.mat
   bivar.coverage.upper.95 <- bivar.est + qnorm(1-0.05/2)*bivar.se.mat
   bivar.covered.95 <- (bivar.true >= bivar.coverage.lower.95) & (bivar.true <= bivar.coverage.upper.95)
@@ -105,6 +106,7 @@ simulation <- function(iter){
               variance=var.res ))
 }
 
+# Initialize model parameters (Sample size, degree, and smoothness)
 L <- 3
 rho <- 3
 nT <- 6
@@ -112,7 +114,7 @@ n.samp <- 20; n.layer <- 2; n.core <- 2
 n <- 100; d <- 2; r <- 1
 nboot<- 100
 
-# Set boundary 
+# Define 2D spatial grid and extract coordinate vectors
 xm <- seq(-1, 3.5, length = 101)
 yn <- seq(-1, 1, length = 101)
 xy_grid <- pracma::meshgrid(xm, yn)
@@ -120,12 +122,13 @@ uu <- c(xy_grid$X)
 vv <- c(xy_grid$Y)
 V.all <- as.matrix(cbind(uu,vv))
 
-# Load horseshoe and find triangulation 
+# Load horseshoe domain and construct triangulation mesh
 bb <- Triangulation::hs
 VT <- TriMesh(bb, n = nT)
 Tr <- as.matrix(VT$Tr) 
 Ver <- as.matrix(VT$V) 
 
+# Results
 res <- lapply(1:100, function(iter) simulation(iter))
 bias_mat <- do.call(rbind, lapply(res, `[[`, "bias"))
 MISE_mat <- do.call(rbind, lapply(res, `[[`, "MISE"))

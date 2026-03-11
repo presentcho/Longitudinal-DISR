@@ -157,6 +157,7 @@ cr_mat_95  <- do.call(rbind, lapply(res, `[[`, "coverage.rate.95"))
 var_mat  <- do.call(rbind, lapply(res, `[[`, "variance"))
 cr_95_map <- Reduce("+", lapply(res, `[[`, 'covered_95_mat')) / length(res)
 
+# Results
 round(colMeans(bias_mat),4)
 round(colMeans(MISE_mat),4)
 round(colMeans(var_mat), 4)

@@ -54,7 +54,7 @@ tij <- as.vector(read.csv('../data/simul2/tij.csv')$x)
 ind.inside <- as.vector(read.csv('../data/simul2/ind.inside.csv')$x)
 bivar.alpha.true <- as.matrix(read.csv('../data/simul2/bivar.alpha.csv'))
 bivar.beta.true <- as.matrix(read.csv('../data/simul2/bivar.beta.csv'))
-trivar.true <- as.matrix(read.csv('../data/simul2/trivar.true.csv'))
+trivar.true <- as.matrix(read.csv('../data/simul2/tri.alpha.csv'))
 
 # Visualize the true coefficient functions
 alpha.true <- bivar.alpha.true

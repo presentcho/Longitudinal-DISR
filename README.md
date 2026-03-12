@@ -11,27 +11,16 @@ This repository contains the code and supplementary data to implement Simulation
 Our code requires the following R packages. Please ensure they are installed before running the scripts:
 
 require(Triangulation) # install_github("FIRST-Data-Lab/Triangulation")
-
 require(BPST)          # install_github("FIRST-Data-Lab/BPST")
-
 require(TPST) #install_github("funstatpackages/TPST")
-
 require(gghilbertstrings) #install_github("cran/gghilbertstrings")
-
 require(mgcv)
-
 require(MGLM)
-
 require(parallel)
-
 require(prodlim)
-
 require(MASS)
-
 require(Matrix)
-
 require(Rcpp)
-
 require(pracma)
 
 ---

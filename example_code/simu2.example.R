@@ -46,15 +46,15 @@ Tr <- as.matrix(VT$Tr)
 Ver <- as.matrix(VT$V) 
 
 # Load simulated datasets and true coefficient parameters
-Y <- read.csv('../data/simul2/Y.csv')
-X <- read.csv('../data/simul2/X.csv')
-V <- read.csv('../data/simul2/V.csv')
-M <- read.csv('../data/simul2/M.csv')$x
-tij <- read.csv('../data/simul2/tij.csv')$x
-ind.inside <- read.csv('../data/simul2/ind.inside.csv')$x
-bivar.alpha.true <- read.csv('../data/simul2/bivar.alpha.csv')
-bivar.beta.true <- read.csv('../data/simul2/bivar.beta.csv')
-trivar.true <- read.csv('../data/simul2/trivar.true.csv')
+Y <- as.matrix(read.csv('../data/simul2/Y.csv'))
+X <- as.matrix(read.csv('../data/simul2/X.csv'))
+V <- as.matrix(read.csv('../data/simul2/V.csv'))
+M <- as.vector(read.csv('../data/simul2/M.csv')$x)
+tij <- as.vector(read.csv('../data/simul2/tij.csv')$x)
+ind.inside <- as.vector(read.csv('../data/simul2/ind.inside.csv')$x)
+bivar.alpha.true <- as.matrix(read.csv('../data/simul2/bivar.alpha.csv'))
+bivar.beta.true <- as.matrix(read.csv('../data/simul2/bivar.beta.csv'))
+trivar.true <- as.matrix(read.csv('../data/simul2/trivar.true.csv'))
 
 # Visualize the true coefficient functions
 alpha.true <- bivar.alpha.true

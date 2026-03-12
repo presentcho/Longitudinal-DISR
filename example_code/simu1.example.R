@@ -11,11 +11,12 @@ library(ggplot2)
 library(splines2)
 require(MGLM)
 library(gghilbertstrings)
-source('funcs/bivar.gc.fit.R')
-source('funcs/ring.dc.R')
-source('funcs/sampling.HC.R')
-source('funcs/local.fit.bivar.R')
-source('funcs/plot.fun.R')
+library(parallel)
+source('../funcs/bivar.gc.fit.R')
+source('../funcs/ring.dc.R')
+source('../funcs/sampling.HC.R')
+source('../funcs/local.fit.bivar.R')
+source('../funcs/plot.fun.R')
 
 # Initialize model parameters (Sample size, degree, and smoothness)
 nT <- 6
@@ -36,12 +37,12 @@ Tr <- as.matrix(VT$Tr)
 Ver <- as.matrix(VT$V) 
 
 # Load simulated datasets and true coefficient parameters
-Y <- read.csv('data/simul1/Y.csv')
-X <- read.csv('data/simul1/X.csv')
-V <- read.csv('data/simul1/V.csv')
-M <- read.csv('data/simul1/M.csv')$x
-ind.inside <- read.csv('data/simul1/ind.inside.csv')$x
-bivar.true <- read.csv('data/simul1/bivar.true.csv')
+Y <- read.csv('../data/simul1/Y.csv')
+X <- read.csv('../data/simul1/X.csv')
+V <- read.csv('../data/simul1/V.csv')
+M <- read.csv('../data/simul1/M.csv')$x
+ind.inside <- read.csv('../data/simul1/ind.inside.csv')$x
+bivar.true <- read.csv('../data/simul1/bivar.true.csv')
 
 # Visualize the true bivariate coefficient functions
 alpha.true <- bivar.true[,1:3]
@@ -121,3 +122,4 @@ HD.res <- round(c(
   apply((as.matrix(HD.beta.est) - as.matrix(beta.true[ind.inside,]))^2, 2, mean)), 3)
 
 print(HD.res)
+

@@ -8,19 +8,22 @@ library(MASS)
 library(mgcv)
 library(splines2)
 library(Matrix)
-require(MGLM)
-source('funcs/simul2.data.gen.R')
-source('funcs/basis.tensor.R')
-source('funcs/energy.tensor.R')
-source('funcs/gc.fit.R')
-source('funcs/gc.fit.ho.R')
-source('funcs/plot.fun.R')
-source('funcs/gc.fit.dc.R')
-source('funcs/sampling.HC.R')
-source('funcs/ring.dc.R')
-source('funcs/basis.tensor.local.R')
-source('funcs/local.fit.R')
-source('funcs/gc.fit.cv.R')
+library(ggplot2)
+library(MGLM)
+library(parallel)
+library(colorRamps)
+source('../funcs/simul2.data.gen.R')
+source('../funcs/basis.tensor.R')
+source('../funcs/energy.tensor.R')
+source('../funcs/gc.fit.R')
+source('../funcs/gc.fit.ho.R')
+source('../funcs/plot.fun.R')
+source('../funcs/gc.fit.dc.R')
+source('../funcs/sampling.HC.R')
+source('../funcs/ring.dc.R')
+source('../funcs/basis.tensor.local.R')
+source('../funcs/local.fit.R')
+source('../funcs/gc.fit.cv.R')
 
 # Initialize model parameters (Sample size, degree, and smoothness)
 L <- 3
@@ -43,15 +46,15 @@ Tr <- as.matrix(VT$Tr)
 Ver <- as.matrix(VT$V) 
 
 # Load simulated datasets and true coefficient parameters
-Y <- read.csv('data/simul2/Y.csv')
-X <- read.csv('data/simul2/X.csv')
-V <- read.csv('data/simul2/V.csv')
-M <- read.csv('data/simul2/M.csv')$x
-tij <- read.csv('data/simul2/tij.csv')$x
-ind.inside <- read.csv('data/simul2/ind.inside.csv')$x
-bivar.alpha.true <- read.csv('data/simul2/bivar.alpha.csv')
-bivar.beta.true <- read.csv('data/simul2/bivar.beta.csv')
-trivar.true <- read.csv('data/simul2/trivar.true.csv')
+Y <- read.csv('../data/simul2/Y.csv')
+X <- read.csv('../data/simul2/X.csv')
+V <- read.csv('../data/simul2/V.csv')
+M <- read.csv('../data/simul2/M.csv')$x
+tij <- read.csv('../data/simul2/tij.csv')$x
+ind.inside <- read.csv('../data/simul2/ind.inside.csv')$x
+bivar.alpha.true <- read.csv('../data/simul2/bivar.alpha.csv')
+bivar.beta.true <- read.csv('../data/simul2/bivar.beta.csv')
+trivar.true <- read.csv('../data/simul2/trivar.true.csv')
 
 # Visualize the true coefficient functions
 alpha.true <- bivar.alpha.true

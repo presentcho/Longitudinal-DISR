@@ -40,12 +40,13 @@ VT <- TriMesh(bb, n = nT)
 Tr <- as.matrix(VT$Tr) 
 Ver <- as.matrix(VT$V) 
 
-# Load simulated datasets and true coefficient parameters
-Y <- as.matrix(read.csv('../data/simul2/Y.csv'))
-X <- as.matrix(read.csv('../data/simul2/X.csv'))
-V <- as.matrix(read.csv('../data/simul2/V.csv'))
-M <- as.vector(read.csv('../data/simul2/M.csv')$x)
-tij <- as.vector(read.csv('../data/simul2/tij.csv')$x)
+# Generate the dataset and true coefficient parameters
+dat <- simul.data.gen(n, Tr, Ver, V.all)
+Y <- dat$Y
+X <- dat$X
+M <- dat$M.vec
+V <- dat$V
+tij <- dat$tij
 
 # Construct tensor product basis and penalty matrices for time and spatial domains
 time.bound<- c(min(tij), max(tij))
@@ -119,3 +120,4 @@ gc.fit.cv <- gc.fit.ho(X.train, Y.train, M.train, U0.train,
                        V, B0, Q2, K, P11, P12, P2, lambda11.optimal, lambda12.optimal, lambda2.optimal)
 gc.fit.cv$sse
 gc.fit.cv$mse
+

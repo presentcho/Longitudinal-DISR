@@ -17,6 +17,7 @@ source('../funcs/ring.dc.R')
 source('../funcs/sampling.HC.R')
 source('../funcs/local.fit.bivar.R')
 source('../funcs/plot.fun.R')
+source('../funcs/simul1.data.gen.R')
 
 # Initialize model parameters (Sample size, degree, and smoothness)
 nT <- 6
@@ -36,17 +37,17 @@ VT <- TriMesh(bb, n = nT)
 Tr <- as.matrix(VT$Tr) 
 Ver <- as.matrix(VT$V) 
 
-# Load simulated datasets and true coefficient parameters
-Y <- read.csv('../data/simul1/Y.csv')
-X <- read.csv('../data/simul1/X.csv')
-V <- read.csv('../data/simul1/V.csv')
-M <- read.csv('../data/simul1/M.csv')$x
-ind.inside <- read.csv('../data/simul1/ind.inside.csv')$x
-bivar.true <- read.csv('../data/simul1/bivar.true.csv')
+# Generate the dataset and true coefficient parameters
+dat <- simul.data.gen(n, Tr, Ver, V.all)
+X <- dat$X
+Y <- dat$Y
+M <- dat$M.vec
+tij <- dat$tij
+ind.inside <- dat$ind.inside
 
 # Visualize the true bivariate coefficient functions
-alpha.true <- bivar.true[,1:3]
-beta.true <- bivar.true[,4:6]
+alpha.true <- dat$bivar.alpha
+beta.true <- dat$bivar.beta
 plot.fun(uu, vv, alpha.true, beta.true, hs, ind.inside)
 
 lambda <- 10^(seq(-6, 0, by = 1))

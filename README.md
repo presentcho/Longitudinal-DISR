@@ -30,30 +30,30 @@ Our code requires the following R packages. Please ensure they are installed bef
 
 ---
 
-## 2. Example Datasets
+## 2. Data Generation
 
-The example datasets are generated to demonstrate the proposed methods. 
+Example datasets can be generated as follows to demonstrate the proposed methods.
 
-### Simulation Study I (data/simul1/)
+### Simulation Study I 
 Generated using funcs/simul1.data.gen.R.
-* Y.csv: True response $Y$ matrix.
-* X.csv: Covariate $X$ matrix.
-* M.csv: Block diagonal matrix containing the elements of the weight matrix $M$.
-* V.csv: Spatial coordinates $V$ matrix.
-* bivar.true.csv: True bivariate coefficient functions $\alpha(v)$ and $\beta(v)$.
-* ind.inside.csv: Spatial indices of the grid points located strictly inside the horseshoe boundary.
+* Y: True response $Y$ matrix.
+* X: Covariate $X$ matrix.
+* M.vec: Block diagonal matrix containing the elements of the weight matrix $M$.
+* V: Spatial coordinates $V$ matrix.
+* bivar.true: True bivariate coefficient functions $\alpha(v)$ and $\beta(v)$.
+* ind.inside: Spatial indices of the grid points located strictly inside the horseshoe boundary.
 
-### Simulation Study II (data/simul2/)
+### Simulation Study II 
 Generated using funcs/simul2.data.gen.R.
-* Y.csv: True response $Y$ matrix.
-* X.csv: Covariate $X$ matrix.
-* M.csv: Block diagonal matrix containing the elements of the weight matrix $M$.
-* V.csv: Spatial coordinates $V$ matrix.
-* tij.csv: Vector of observed time points.
-* trivar.true.csv: True trivariate coefficient function $\alpha(v, t)$.
-* bivar.alpha.csv: True bivariate coefficient function $\alpha(v)$.
-* bivar.beta.csv: True bivariate coefficient function $\beta(v)$.
-* ind.inside.csv: Spatial indices of the grid points located strictly inside the horseshoe boundary.
+* Y: True response $Y$ matrix.
+* X: Covariate $X$ matrix.
+* M.vec: Block diagonal matrix containing the elements of the weight matrix $M$.
+* V: Spatial coordinates $V$ matrix.
+* tij: Vector of observed time points.
+* trivar.true: True trivariate coefficient function $\alpha(v, t)$.
+* bivar.alpha: True bivariate coefficient function $\alpha(v)$.
+* bivar.beta: True bivariate coefficient function $\beta(v)$.
+* ind.inside: Spatial indices of the grid points located strictly inside the horseshoe boundary.
 
 ---
 

@@ -46,21 +46,20 @@ VT <- TriMesh(bb, n = nT)
 Tr <- as.matrix(VT$Tr) 
 Ver <- as.matrix(VT$V) 
 
-# Load simulated datasets and true coefficient parameters
-Y <- as.matrix(read.csv('../data/simul2/Y.csv'))
-X <- as.matrix(read.csv('../data/simul2/X.csv'))
-V <- as.matrix(read.csv('../data/simul2/V.csv'))
-M <- as.vector(read.csv('../data/simul2/M.csv')$x)
-tij <- as.vector(read.csv('../data/simul2/tij.csv')$x)
-ind.inside <- as.vector(read.csv('../data/simul2/ind.inside.csv')$x)
-bivar.alpha.true <- as.matrix(read.csv('../data/simul2/bivar.alpha.csv'))
-bivar.beta.true <- as.matrix(read.csv('../data/simul2/bivar.beta.csv'))
-trivar.true <- as.matrix(read.csv('../data/simul2/tri.alpha.csv'))
+# Generate the dataset and true coefficient parameters
+dat <- simul.data.gen(n, Tr, Ver, V.all)
+Y <- dat$Y
+X <- dat$X
+M <- dat$M.vec
+V <- dat$V
+tij <- dat$tij
+ind.inside <- dat$ind.inside
+bivar.alpha.true <- dat$bivar.alpha
+bivar.beta.true <- dat$bivar.beta
+trivar.true <- dat$tri.alpha
 
 # Visualize the true coefficient functions
-alpha.true <- bivar.alpha.true
-beta.true <- bivar.beta.true
-plot.fun(uu, vv, alpha.true, beta.true, hs, ind.inside)
+plot.fun(uu, vv, bivar.alpha.true, bivar.beta.true, hs, ind.inside)
 
 # Construct tensor product basis and penalty matrices for time and spatial domains
 time.bound<- c(min(tij), max(tij))
@@ -96,7 +95,7 @@ plot.fun(uu, vv, global.alpha.est, global.beta.est, hs, ind.inside)
 
 # Calculate Mean Integrated Squared Error (MISE) for the global method
 global.trivar.all <- rowMeans((global.trivar.est - trivar.true)^2, na.rm = TRUE)
-global.res <- round(c(mean(global.trivar.all), apply((global.alpha.est-alpha.true)^2, 2, mean), apply((global.beta.est-beta.true)^2, 2, mean)), 3)
+global.res <- round(c(mean(global.trivar.all), apply((global.alpha.est-bivar.alpha.true)^2, 2, mean), apply((global.beta.est-bivar.beta.true)^2, 2, mean)), 3)
 names(global.res)[1] <- 'alpha0'
 print(global.res)
 
@@ -123,6 +122,6 @@ plot.fun(uu, vv, HD.alpha.est, HD.beta.est, hs, ind.inside)
 
 # Calculate Mean Integrated Squared Error (MISE) for the HD method
 HD.trivar.all <- rowMeans((HD.trivar.est - trivar.true)^2, na.rm = TRUE)
-HD.res <- round(c(mean(HD.trivar.all), apply((HD.alpha.est-alpha.true)^2, 2, mean), apply((HD.beta.est-beta.true)^2, 2, mean)), 3)
+HD.res <- round(c(mean(HD.trivar.all), apply((HD.alpha.est-bivar.alpha.true)^2, 2, mean), apply((HD.beta.est-bivar.beta.true)^2, 2, mean)), 3)
 names(HD.res)[1] <- 'alpha0'
 print(HD.res)

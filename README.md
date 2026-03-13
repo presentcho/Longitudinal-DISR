@@ -30,7 +30,7 @@ Our code requires the following R packages. Please ensure they are installed bef
 
 ---
 
-## 2. Data Generation
+## 2. Example Codes
 
 Example datasets can be generated as follows to demonstrate the proposed methods.
 
